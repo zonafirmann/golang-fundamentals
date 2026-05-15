@@ -2,34 +2,41 @@ package main
 
 import "fmt"
 
+// 1. STRUCT: This is the Blueprint (Cetakan) of our data.
+// In the future, this is exactly how you will map JSON data from an API.
+type Task struct {
+	ID     int
+	Title  string
+	IsDone bool
+}
+
+// 2. FUNCTION (Method): Giving behavior to our Struct.
+// This function specifically belongs to the 'Task' struct.
+func (t Task) DisplayStatus() {
+	status := "⏳ [IN PROGRESS]"
+	if t.IsDone {
+		status = "✅ [COMPLETED]"
+	}
+	fmt.Printf("Task %d: %s %s\n", t.ID, t.Title, status)
+}
+
 func main() {
-	// 1. SLICES: Creating a dynamic list of daily engineering tasks
-	tasks := []string{
-		"Master Workspace & Git Setup",
-		"Understand Go Control Flow",
-		"Build a CLI Task Manager",
+	fmt.Println("=== SYSTEM LOG: ADVANCED TASK MANAGER ===")
+
+	// 3. SLICE OF STRUCTS: Creating a list of complex objects
+	var myTasks = []Task{
+		{ID: 1, Title: "Master Workspace & Git Setup", IsDone: true},
+		{ID: 2, Title: "Understand Go Control Flow", IsDone: true},
+		{ID: 3, Title: "Implement Structs and Functions", IsDone: false},
+		{ID: 4, Title: "Build RESTful API", IsDone: false},
 	}
 
-	fmt.Println("=== SYSTEM LOG: DAILY TASKS ===")
-
-	// 2. IF-ELSE: Logic to check workload capacity
-	// len(tasks) is a built-in function to count items in a slice
-	if len(tasks) > 5 {
-		fmt.Println("[WARNING] CPU Overload: Too many tasks scheduled today!")
-	} else if len(tasks) == 0 {
-		fmt.Println("[ALERT] Idle status: No tasks assigned.")
-	} else {
-		fmt.Printf("[INFO] Workload optimal. %d tasks in queue.\n", len(tasks))
+	// 4. CLEAN EXECUTION: The main function becomes very clean and easy to read
+	for _, task := range myTasks {
+		// Calling the method attached to the struct
+		task.DisplayStatus()
 	}
 
-	fmt.Println("--------------------------------")
-
-	// 3. FOR LOOP: Iterating through the slice
-	// 'range' automatically gives us the Index (0, 1, 2) and the Value (the string)
-	for index, task := range tasks {
-		// We use index+1 so the display starts at 1 instead of 0
-		fmt.Printf("Task %d: %s\n", index+1, task)
-	}
-
-	fmt.Println("================================")
+	fmt.Println("=========================================")
+	fmt.Printf("Total tasks loaded into memory: %d\n", len(myTasks))
 }
