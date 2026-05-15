@@ -1,0 +1,27 @@
+name: Go Continuous Integration
+
+# Robot akan menyala setiap kali kamu melakukan "Push" atau "Pull Request" ke branch main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # Menjalankan server Linux virtual
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22' # Menyesuaikan dengan versi Golang-mu
+
+    - name: Verify Dependencies
+      run: go mod tidy
+
+    - name: Build Code
+      run: go build -v ./...
