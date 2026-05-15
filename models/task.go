@@ -1,18 +1,16 @@
-// Baris pertama WAJIB nama folder tempat file ini berada
 package models
 
 import "fmt"
 
 // Task represents a unit of work in our system.
-// Notice that 'Task' starts with a CAPITAL letter.
+// We add "Struct Tags" (the backticks) to tell Go how to translate this into JSON.
 type Task struct {
-	ID     int
-	Title  string
-	IsDone bool
+	ID     int    `json:"id"`
+	Title  string `json:"title"`
+	IsDone bool   `json:"is_done"`
 }
 
 // DisplayStatus prints the current state of the task.
-// Method name also starts with a CAPITAL letter.
 func (t Task) DisplayStatus() {
 	status := "⏳ [IN PROGRESS]"
 	if t.IsDone {
