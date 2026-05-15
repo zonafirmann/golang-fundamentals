@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
-	"strings"
 
 	"github.com/zonafirmann/golang-fundamentals/models"
 )
@@ -13,67 +12,48 @@ import (
 // Define a constant for our database file name
 const fileName = "tasks.json"
 
-// LoadTasks reads the JSON file and converts it back to a Go slice.
+// LoadTasks reads the JSON database and returns a slice of tasks.
 func LoadTasks() []models.Task {
 	var tasks []models.Task
-
-	// Attempt to read the physical file
 	bytes, err := os.ReadFile(fileName)
 	if err != nil {
-		// If file doesn't exist yet, return an empty slice safely
 		return tasks
 	}
-
-	// UNMARSHAL: Translate JSON bytes back into the Go 'tasks' slice
+	// Translate JSON bytes back into the Go slice
 	json.Unmarshal(bytes, &tasks)
 	return tasks
 }
 
-// SaveTasks converts the Go slice into JSON and writes it to the hard drive.
-func SaveTasks(tasks []models.Task) {
-	// MARSHAL: Translate Go slice into beautifully formatted JSON bytes
-	bytes, _ := json.MarshalIndent(tasks, "", "  ")
+// ---------------------------------------------------------
+// CONTROLLER: Handles incoming HTTP requests for tasks
+// ---------------------------------------------------------
+func getTasksHandler(w http.ResponseWriter, r *http.Request) {
+	// 1. Retrieve data from the persistent storage
+	myTasks := LoadTasks()
 
-	// Write the bytes to a file with standard 0644 read/write permissions
-	os.WriteFile(fileName, bytes, 0644)
+	// 2. Set the HTTP Header to indicate JSON payload
+	w.Header().Set("Content-Type", "application/json")
+
+	// 3. Encode the Go slice into JSON and send it as the response
+	json.NewEncoder(w).Encode(myTasks)
+	
+	fmt.Println("[LOG] GET request received at /tasks endpoint!")
 }
 
 func main() {
-	fmt.Println("=== SYSTEM LOG: PERSISTENT CLI ===")
+	fmt.Println("=== SYSTEM LOG: INITIALIZING RESTFUL API ===")
 
-	// 1. Load existing tasks from the hard drive (Storage)
-	myTasks := LoadTasks()
-	fmt.Printf("[INFO] Loaded %d tasks from database.\n", len(myTasks))
+	// 1. Register the route (Endpoint) and its corresponding handler
+	http.HandleFunc("/tasks", getTasksHandler)
 
-	// 2. Prepare the keyboard reader
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter a new task for today (or press Enter to skip): ")
+	// 2. Define the port for the local web server
+	port := ":8080"
+	fmt.Printf("[INFO] Server is running on http://localhost%s\n", port)
+	fmt.Println("[INFO] Press CTRL+C in terminal to stop the server.")
 
-	input, err := reader.ReadString('\n')
+	// 3. Start the HTTP server to listen for incoming network requests
+	err := http.ListenAndServe(port, nil)
 	if err != nil {
-		fmt.Println("Error reading input:", err)
-		return
-	}
-
-	cleanInput := strings.TrimSpace(input)
-
-	// 3. Only process if the user actually typed something
-	if cleanInput != "" {
-		newTask := models.Task{
-			ID:     len(myTasks) + 1,
-			Title:  cleanInput,
-			IsDone: false,
-		}
-		// Add new task to memory
-		myTasks = append(myTasks, newTask)
-
-		// Save the updated memory back to the physical file
-		SaveTasks(myTasks)
-		fmt.Println("[SUCCESS] Task saved permanently to tasks.json")
-	}
-
-	fmt.Println("\n--- CURRENT TASK LIST ---")
-	for _, task := range myTasks {
-		task.DisplayStatus()
+		fmt.Println("[FATAL ERROR] Server failed to start:", err)
 	}
 }
