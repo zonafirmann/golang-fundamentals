@@ -1,42 +1,27 @@
 package main
 
-import "fmt"
-
-// 1. STRUCT: This is the Blueprint (Cetakan) of our data.
-// In the future, this is exactly how you will map JSON data from an API.
-type Task struct {
-	ID     int
-	Title  string
-	IsDone bool
-}
-
-// 2. FUNCTION (Method): Giving behavior to our Struct.
-// This function specifically belongs to the 'Task' struct.
-func (t Task) DisplayStatus() {
-	status := "⏳ [IN PROGRESS]"
-	if t.IsDone {
-		status = "✅ [COMPLETED]"
-	}
-	fmt.Printf("Task %d: %s %s\n", t.ID, t.Title, status)
-}
+import (
+	"fmt"
+	// Mengimpor package 'models' yang baru kita buat
+	// Format: nama_module_di_go.mod/nama_folder
+	"github.com/zonafirmann/golang-fundamentals/models"
+)
 
 func main() {
-	fmt.Println("=== SYSTEM LOG: ADVANCED TASK MANAGER ===")
+	fmt.Println("=== SYSTEM LOG: MODULAR ARCHITECTURE ===")
 
-	// 3. SLICE OF STRUCTS: Creating a list of complex objects
-	var myTasks = []Task{
+	// Memanggil struct Task dari package models
+	var myTasks = []models.Task{
 		{ID: 1, Title: "Master Workspace & Git Setup", IsDone: true},
-		{ID: 2, Title: "Understand Go Control Flow", IsDone: true},
-		{ID: 3, Title: "Implement Structs and Functions", IsDone: false},
-		{ID: 4, Title: "Build RESTful API", IsDone: false},
+		{ID: 2, Title: "Understand Go Packages and Imports", IsDone: false},
+		{ID: 3, Title: "Implement Modular Architecture", IsDone: false},
 	}
 
-	// 4. CLEAN EXECUTION: The main function becomes very clean and easy to read
 	for _, task := range myTasks {
-		// Calling the method attached to the struct
+		// Memanggil method dari package models
 		task.DisplayStatus()
 	}
 
-	fmt.Println("=========================================")
-	fmt.Printf("Total tasks loaded into memory: %d\n", len(myTasks))
+	fmt.Println("========================================")
+	fmt.Printf("System initialized with %d modular tasks.\n", len(myTasks))
 }
